@@ -1,0 +1,36 @@
+main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+}
+.section_name{
+    background-color: #c9a1436e;
+    font-size: 2em;
+    color: yellow;
+    font-weight: bold;
+    -webkit-text-stroke-width: 0.5px;
+    -webkit-text-stroke-color: red;
+    padding: 5px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+section{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+section .menuItem{
+    font-size: 1.5em;
+    padding: 10px;
+    margin: 10px;
+    background-color: #9746516e;
+    border-radius: 30px;
+    color: rgb(255, 254, 215);
+    max-width: 27vw;
+}
+section img{
+    max-width: 25vw;
+    max-height: 25vh;
+}

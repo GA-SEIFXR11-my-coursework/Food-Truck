@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block more_head %}
+    <link rel="stylesheet" href="static/menu.css">
+{% endblock %}
+{% block main_content %}
+<p class="section_name">Burgers</p>
+<section id="sc_burgers">
+    {% for item in burgers %}
+    <div class="menuItem">
+        <p class="name">{{ item["name"] }}</p>
+        <p class="price">{{ item["price"] }}</p>
+        <img src={{ item["image_url"] }}></img>
+        <p class="description">{{ item["description"] }}</p>
+    </div>
+    {% endfor%}
+</section>
+<p class="section_name">Drinks</p>
+<section id="sc_drinks">
+    {% for item in drinks %}
+    <div class="menuItem">
+        <p class="name">{{ item["name"] }}</p>
+        <p class="price">{{ item["price"] }}</p>
+        <img src={{ item["image_url"] }}></img>
+        <p class="description">{{ item["description"] }}</p>
+    </div>
+    {% endfor%}
+</section>
+{% endblock %}
