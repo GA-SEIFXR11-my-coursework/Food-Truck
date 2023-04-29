@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Waccas</title>
+        <meta name="description" content="Wacca wacca">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="./imgs/Waccas.png">
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    </head>
+    <body onload="pageLoad()">
+        <div class="Title">
+            <div id="img_waccas"></div>
+            <h1>Waccas</h1>
+            <h2>Burger parlour</h2>
+        </div>
+        <div class="burgerList">
+            <h1>Burger Time!</h1>
+            <ul id="burger_list"></ul>
+            <ul id="button_list">
+                <button onclick="buttonAsk()">Order here!</button>
+                <button id="button_fries" onclick="buttonFries()">Fries? +$2.00</button>
+                <button id="button_upsize" onclick="buttonUpsize()">Upsize? +$1.50</button>
+            </ul>
+        </div>
+        <div class="burgerInfo">
+            <var id="burger_id" hidden="true">-1</var>
+            <p id="burger_selected"></p>
+            <p id="what_u_ordered"></p>
+            <p id="price"></p>
+            <ul id="layers"></ul>
+            <div id="burger_img"></div>
+        </div>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        
+        <script src="script.js" async defer></script>
+    </body>
+</html>

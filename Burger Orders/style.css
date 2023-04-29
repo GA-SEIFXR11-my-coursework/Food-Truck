@@ -1,0 +1,82 @@
+/*
+https://stripesgenerator.com/
+*/
+body{
+    background-image: linear-gradient(45deg, #d98b96 16.67%, #f0e8b8 16.67%, #f0e8b8 50%, #d98b96 50%, #d98b96 66.67%, #f0e8b8 66.67%, #f0e8b8 100%);
+    background-image: -webkit-linear-gradient(45deg, #d98b96 16.67%, #f0e8b8 16.67%, #f0e8b8 50%, #d98b96 50%, #d98b96 66.67%, #f0e8b8 66.67%, #f0e8b8 100%);
+    background-image: -moz-linear-gradient(45deg, #d98b96 16.67%, #f0e8b8 16.67%, #f0e8b8 50%, #d98b96 50%, #d98b96 66.67%, #f0e8b8 66.67%, #f0e8b8 100%);
+    background-size: 84.85px 84.85px;
+    font-family: 'Indie Flower', cursive;
+    margin: 2em;
+}
+.Title{
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+.Title h1{
+    color: yellow;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: red;
+    text-align: center;
+    font-size: 6em;
+    margin: -20px 0px;
+}
+.Title h2{    
+    color: rgb(0, 0, 0);
+    text-align: center;
+    font-size: 2em;
+    margin: -10px 0px;
+}
+.Title > #img_waccas{
+    border: 2px solid;
+    border-color: whitesmoke;
+    width: 128px;
+    height: 128px;
+    border-radius: 20%;
+    background-image: url("./imgs/Waccas.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: auto;
+}
+
+.burgerList li{
+    color: red;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: maroon;
+    list-style: none;
+    font-size: 2.5em;
+}
+.burgerList li:hover{
+    background-color: aliceblue;
+}
+
+#burger_selected{
+    font-size: 2em;
+    color: maroon;
+}
+#price{
+    font-size: 2em;
+    color: maroon;
+}
+#burger_img{
+    float: left;
+}
+
+#layers{
+    float: right;
+    margin: -30px 150px 10px 5px;
+    font-size: 1.5em;
+    color: maroon;
+}
+
+#what_u_ordered{
+    font-size: 3em;
+    color: red;    
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+    border-radius: 3em;
+    border-style: double;
+    border-color: red;
+    padding: 20px;
+}

@@ -1,0 +1,40 @@
+{
+    "entries": 
+    [
+        {
+            "name": "krabby patty",
+            "category": "burger",
+            "price_in_cents": 299,
+            "description": "A scrumptious Krabby Patty. I killed spongebob and threatened MrKrabs for this recipe so you'd better savour it.",
+            "image_url": "./imgs/krabby-patty.jpg"
+        },
+        {
+            "name": "Beesechurger",
+            "category": "burger",
+            "price_in_cents": 699,
+            "description": "Classic Beesechurger. Our beese is delicately prepared and our churg is marinated in our secret spice blend.",
+            "image_url": "./imgs/beesechurger.jpg"
+        },
+        {
+            "name": "KurgerBing® Whonper w/Bees",
+            "category": "burger",
+            "price_in_cents": 199,
+            "description": "Why would you want bees? It's too late now🐝. You ha🐝ve bees on your hands, and in y🐝ou🐝r fa🐝ce.🐝 THEY🐝'RE 🐝ever🐝y🐝we🐝hh🐝re! NOT🐝 THE 🐝EES🐝🐝! ",
+            "image_url": "./imgs/whonper-with-bees.jpg"
+        },
+        {
+            "name": "Conke",
+            "category": "drink",
+            "price_in_cents": 349,
+            "description": "",
+            "image_url": "./imgs/conke.webp"
+        },
+        {
+            "name": "Bepis",
+            "category": "drink",
+            "price_in_cents": 349,
+            "description": "",
+            "image_url": "./imgs/bepis.jpeg"
+        }
+    ]
+}

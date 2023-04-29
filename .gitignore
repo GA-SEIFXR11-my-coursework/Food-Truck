@@ -4,6 +4,9 @@
 # test
 .asdf
 
+#sensitive info
+.pgpass
+
 # ignore because this is a shared repo
 .vscode
 node_modules
