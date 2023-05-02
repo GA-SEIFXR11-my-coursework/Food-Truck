@@ -60,6 +60,9 @@ def html_contact():
 def html_bad_page():
     return render_template("bad.html")
 
+@app.route("/admin")
+def html_admin():
+    return render_template("admin.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

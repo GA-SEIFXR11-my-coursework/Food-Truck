@@ -1,7 +1,7 @@
 import subprocess
 import json
 import psycopg2
-
+import re
 class Psql_interface():
     """
         src_path is where the json files are contained
@@ -10,23 +10,25 @@ class Psql_interface():
     pguser: str
     _password: str
     db_name: str
-    db_template_json_fpath: str
-    db_seed_json_fpath: str
+    db_template_json_fname: str
+    db_seed_json_fname: str
     src_path: str 
     sh_command: str
-    table_name: str
-    table_fields: list[dict]
     
-    def __init__(self, pguser:str, pgpass:str, db_name:str,  src_path:str, db_template_json_fpath:str, db_seed_json_fpath:str,):
+    def __init__(self, pguser:str, pgpass:str, db_name:str,  src_path:str):
         self.pguser = pguser
         self._password = pgpass
         self.db_name = db_name
-        self.db_template_json_fpath = db_template_json_fpath
-        self.db_seed_json_fpath = db_seed_json_fpath
         self.src_path = src_path
         self.sh_command = f"PGPASSWORD={self._password} psql -U {pguser} -d {self.db_name}"
-        self.table_fields = []
-        self.table_name = ""
+        return
+    
+    def set_db_template_json_fname(self, db_template_json_fname):
+        self.db_template_json_fname = db_template_json_fname
+        return
+    
+    def set_db_seed_json_fname(self, db_seed_json_fname):
+        self.db_seed_json_fname = db_seed_json_fname
         return
     
     def psql_shell_query(self, sql_query: str, verbose:bool = None):
@@ -41,7 +43,7 @@ class Psql_interface():
         return ret
     
     def psql_psycopg2_query(self, sql_query: str, field_values: list = None):
-        if not self.check_dbexist():
+        if not self.check_db_exists():
             raise Exception("DB has not been created yet. Cannot populate DB that does not exist.")
         connection = psycopg2.connect(dbname=self.db_name, user=self.pguser, password=self._password)
         cursor = connection.cursor()
@@ -57,7 +59,7 @@ class Psql_interface():
         connection.close()
         return results
 
-    def check_dbexist(self):
+    def check_db_exists(self):
         proc = subprocess.Popen(self.sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _, stderr = proc.communicate()
         err = stderr.decode()
@@ -66,8 +68,35 @@ class Psql_interface():
             return False
         return True
     
+    def check_table_exists(self, table_name):
+        console_out = self.psql_shell_query(f"\d {table_name}")
+        if f'Did not find any relation named "{table_name}".' in " ".join(console_out):
+            return False
+        return True
+    
+    def obtain_table_fields(self, table_name) -> list[str]:
+        console_out = self.psql_shell_query(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table_name}'")
+        stdout = console_out[0]
+        # Example output:
+        #   column_name   |     data_type     
+        # ----------------+-------------------
+        #  id             | integer
+        #  name           | character varying
+        #  category       | character varying
+        #  price_in_cents | integer
+        #  description    | character varying
+        #  image_url      | character varying
+        # (6 rows)
+        regex = re.compile(r'^\s*(\w+)\s*\|\s*([\w\s]+)\s*$', re.MULTILINE)
+        matched = regex.findall(stdout)
+        matched = matched[1:] # exclude ('column_name','data_type')
+        table_fields = []
+        for match in matched:
+            table_fields.append(match)
+        return table_fields
+    
     def drop_db(self):
-        if self.check_dbexist():
+        if self.check_db_exists():
             sh_command = f"PGPASSWORD={self._password} psql -U postgres"
             proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             _, _ = proc.communicate(input=f"DROP DATABASE {self.db_name}".encode())
@@ -75,63 +104,72 @@ class Psql_interface():
         return
     
     def create_db(self):
-        if not self.check_dbexist():
+        if not self.check_db_exists():
             sh_command = f"PGPASSWORD={self._password} createdb {self.db_name}"
             proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             _, _ = proc.communicate(input=f"\q".encode())
             proc.terminate()
         return
     
-    def setup_db(self):
-        with open(f"{self.src_path}/{self.db_template_json_fpath}") as fp:
+    def setup_tables_from_json(self):
+        if self.db_template_json_fname is None:
+            print("JSON fname not set yet")
+            return
+        with open(f"{self.src_path}/{self.db_template_json_fname}") as fp:
             setup_info = json.load(fp)
-        table =  setup_info["db_table"]
-        self.table_name = table['name']
-        psql_command = f"CREATE TABLE {self.table_name}"
-        psql_command += "("
-        for column, type in table["columns"].items():
-            self.table_fields.append({"column":column,"type":type})
-            psql_command += f"{column} {type}," 
-        psql_command = psql_command[:-1]    # remove last comma
-        psql_command += ");"
-        self.psql_psycopg2_query(psql_command)
+        for table in setup_info["db_tables"]:
+            if self.check_table_exists(table["name"]):
+                print(f"Table {table['name']} already exists. Skipping setup for this table...")
+                continue
+            psql_command = f"CREATE TABLE {table['name']}"
+            psql_command += "("
+            for column, type in table["columns"].items():
+                psql_command += f"{column} {type}," 
+            psql_command = psql_command[:-1]    # remove last comma
+            psql_command += ");"
+            self.psql_psycopg2_query(psql_command)
         return
     
     def populate_table_from_json(self):
-        with open(f"{self.src_path}/{self.db_seed_json_fpath}") as fp:
+        if self.db_seed_json_fname is None:
+            print("JSON fname not set yet")
+            return
+        with open(f"{self.src_path}/{self.db_seed_json_fname}") as fp:
             data = json.load(fp)
+        table_name = data["table_name"]
+        table_fields = self.obtain_table_fields(table_name)
         for entry in data['entries']:
             field_values = []
             field_names = []
-            for field in self.table_fields:
-                if "PRIMARY KEY" in field["type"]:
+            for field in table_fields:
+                col_name = field[0]
+                col_define = field[1] 
+                if "PRIMARY KEY" in col_define:
                     continue
                 try:
-                    value = entry[ field["column"] ]
+                    value = entry[ col_name ]
                 except:
+                    # entry does not have this column which may have been intentionally omitted
                     continue
-                field_names.append( field["column"] )
-                if any( substring in field["type"].lower() for substring in ["text", "char"] ):
+                field_names.append( col_name )
+                if any( substring in col_define.lower() for substring in ["text", "char"] ):
                     field_values.append( str(value) )
-                elif( "int" in field["type"].lower() ):
+                elif( "int" in col_define.lower() ):
                     field_values.append( int(value) )
                 else:
                     field_values.append( value )
             placeholders_str = ", ".join([ "%s" for x in range(len(field_names)) ])
             psql_command = f"""
-                INSERT INTO {self.table_name}({', '.join(field_names)})
+                INSERT INTO {table_name}({', '.join(field_names)})
                 VALUES ({placeholders_str})
                 ;
             """
             self.psql_psycopg2_query(psql_command, field_values)
-
         return
     
-    def regenerate_db(self):
+    def reset_db(self):
         self.drop_db()
         self.create_db()
-        self.setup_db()
-        self.populate_table_from_json()
         return
     
 if __name__ == "__main__":
