@@ -4,6 +4,10 @@
 # test
 .asdf
 
+# python stuff
+__pychache__/
+venv/
+
 #sensitive info
 .pgpass
 

@@ -24,7 +24,9 @@ app.config["SECRET_KEY"] = "My secret key"
 @app.route("/")
 def html_home():
     username = session["username"] if "username" in session else None
-    return render_template("home.html", username=username)
+    is_admin = session["is_admin"] if "is_admin" in session else False
+    return render_template("home.html", username=username, is_admin=is_admin)
+
 
 @app.route("/menu")
 def html_menu():
@@ -100,12 +102,13 @@ def html_signin():
         if not ((user in users) or (user in emails)):
             return render_template("signin.html", invalid_user="True")
         sql_query = f"SELECT password_hash FROM users WHERE username = '{user}'"
-        hashed_password = psql.psql_psycopg2_query(sql_query)
-        hashed_password = hashed_password[0][0]
+        hashed_password = psql.psql_psycopg2_query(sql_query)[0][0]
         isValidPassword = bcrypt.checkpw(req.form.get("password").encode(), hashed_password.encode())
         if not (isValidPassword):
             return render_template("signin.html", invalid_user="True")
         session["username"] = user
+        sql_query = f"SELECT is_admin FROM users WHERE username = '{user}'"
+        session["is_admin"] = psql.psql_psycopg2_query(sql_query)[0][0]
         return redirect("/")
 
 @app.route("/signup", methods=["GET","POST"])

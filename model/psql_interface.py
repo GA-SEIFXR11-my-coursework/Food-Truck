@@ -156,6 +156,8 @@ class Psql_interface():
                     field_values.append( str(value) )
                 elif( "int" in col_define.lower() ):
                     field_values.append( int(value) )
+                elif( "bool" in col_define.lower() ):
+                    field_values.append( str(value) )
                 else:
                     field_values.append( value )
             placeholders_str = ", ".join([ "%s" for x in range(len(field_names)) ])

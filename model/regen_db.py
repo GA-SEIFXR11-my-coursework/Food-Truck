@@ -6,7 +6,8 @@ PGUSER = "postgres"
 PGPASS_FILE = ".pgpass"
 DB_NAME = "food_truck"
 TEMPLATE_JSON = "db_tables_template.json"
-FOODS_SEED_DATA_JSON = "db_food_seed_data.json"
+FOOD_SEED_DATA_JSON = "db_food_seed_data.json"
+USERS_SEED_DATA_JSON = "ezhax_admin_account.json"
 SRC_PATH = "../src"
 
 if __name__ == "__main__":
@@ -17,5 +18,7 @@ if __name__ == "__main__":
     psql.reset_db()
     psql.set_db_template_json_fname(TEMPLATE_JSON)
     psql.setup_tables_from_json()
-    psql.set_db_seed_json_fname(FOODS_SEED_DATA_JSON)
+    psql.set_db_seed_json_fname(FOOD_SEED_DATA_JSON)
+    psql.populate_table_from_json()
+    psql.set_db_seed_json_fname(USERS_SEED_DATA_JSON)
     psql.populate_table_from_json()
