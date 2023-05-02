@@ -1,0 +1,11 @@
+body{
+    font-size: 1.5em;
+    justify-content: center;
+    text-align: center;
+}
+.invalid_user{
+    visibility: show;
+    color: rgba(255, 0, 0, 0.657);
+    font-size: 2em;
+}
+
