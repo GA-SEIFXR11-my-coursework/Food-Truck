@@ -5,8 +5,9 @@
 .asdf
 
 # python stuff
-__pychache__/
+__pycache__/
 venv/
+model/__pychache__/
 
 #sensitive info
 .pgpass
