@@ -2,6 +2,7 @@ import subprocess
 import json
 import psycopg2
 import re
+import platform
 class Psql_interface():
     """
         src_path is where the json files are contained
@@ -14,13 +15,22 @@ class Psql_interface():
     db_seed_json_fname: str
     src_path: str 
     sh_command: str
+    pghost: str
+    pgport: int
     
-    def __init__(self, pguser:str, pgpass:str, db_name:str,  src_path:str):
+    def __init__(self, pguser:str, pgpass:str, db_name:str,  src_path:str, pghost:str=None, pgport:int = None):
         self.pguser = pguser
         self._password = pgpass
         self.db_name = db_name
         self.src_path = src_path
-        self.sh_command = f"PGPASSWORD={self._password} psql -U {pguser} -d {self.db_name}"
+        self.pghost = "localhost" if pghost is None else pghost
+        self.pgport = 5432 if pgport is None else pgport
+        if platform.system() == 'Windows':
+            self.sh_psql_login = f'psql "postgresql://{self.pguser}:{self._password}@{self.pghost}:{self.pgport}"'
+            self.sh_psql_dbconnect = f'psql "postgresql://{self.pguser}:{self._password}@{self.pghost}:{self.pgport}/{self.db_name}"'
+        else:
+            self.sh_psql_login = f"PGPASSWORD={self._password} psql -U {self.pguser} -h {self.pghost} -p {self.pgport}"
+            self.sh_psql_dbconnect = f"PGPASSWORD={self._password} psql -U {self.pguser} -h {self.pghost} -p {self.pgport} -d {self.db_name}"
         return
     
     def set_db_template_json_fname(self, db_template_json_fname):
@@ -32,7 +42,8 @@ class Psql_interface():
         return
     
     def psql_shell_query(self, sql_query: str, verbose:bool = None):
-        proc = subprocess.Popen(self.sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sh_command = self.sh_psql_dbconnect
+        proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate(input=sql_query.encode())
         stdout = stdout.decode()
         stderr = stderr.decode()
@@ -60,7 +71,8 @@ class Psql_interface():
         return results
 
     def check_db_exists(self):
-        proc = subprocess.Popen(self.sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sh_command = self.sh_psql_dbconnect
+        proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _, stderr = proc.communicate()
         err = stderr.decode()
         proc.terminate()
@@ -97,7 +109,7 @@ class Psql_interface():
     
     def drop_db(self):
         if self.check_db_exists():
-            sh_command = f"PGPASSWORD={self._password} psql -U postgres"
+            sh_command = self.sh_psql_login
             proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             _, _ = proc.communicate(input=f"DROP DATABASE {self.db_name}".encode())
             proc.terminate()
@@ -105,9 +117,9 @@ class Psql_interface():
     
     def create_db(self):
         if not self.check_db_exists():
-            sh_command = f"PGPASSWORD={self._password} createdb {self.db_name}"
+            sh_command = self.sh_psql_login
             proc = subprocess.Popen(sh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            _, _ = proc.communicate(input=f"\q".encode())
+            _, _ = proc.communicate(input=f"CREATE DATABASE {self.db_name}".encode())
             proc.terminate()
         return
     
